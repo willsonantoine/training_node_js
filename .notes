@@ -1,0 +1,6 @@
+- Couche -> ordinateur, serveur, 
+    1. Request http (Apatch2 et Nginx,....)
+        - verifier si domaine-> filewall -> cash -> application
+        # Application -> verification route -> middleware ->
+    2. Commande AT
+    3. 

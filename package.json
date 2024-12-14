@@ -1,0 +1,36 @@
+{
+  "name": "training_1",
+  "version": "1.0.0",
+  "description": "the traning app",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "start": "node build/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/willsonantoine/training_node_js.git"
+  },
+  "keywords": [
+    "training",
+    "api",
+    "node",
+    "js",
+    "ts"
+  ],
+  "author": "willsonantoine",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/willsonantoine/training_node_js/issues"
+  },
+  "homepage": "https://github.com/willsonantoine/training_node_js#readme",
+  "dependencies": {
+    "ts-node": "^10.9.2",
+    "tsc": "^2.0.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
