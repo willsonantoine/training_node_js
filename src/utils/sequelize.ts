@@ -6,7 +6,7 @@ const sequelize = new Sequelize({
   username: "root",
   password: "root",
   dialect: "mysql",
-  logging: true,
+  logging: false,
 });
 
 sequelize

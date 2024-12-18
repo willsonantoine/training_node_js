@@ -17,4 +17,13 @@ const create = [
     .withMessage("password confirm is required"),
 ];
 
-export default { create };
+const login = [
+  body("email")
+    .notEmpty()
+    .withMessage("email is required")
+    .isEmail()
+    .withMessage("email is not valid"),
+  body("password").notEmpty().withMessage("password is required"),
+];
+
+export default { create,login };

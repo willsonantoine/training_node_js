@@ -1,6 +1,13 @@
 import UsersService from "../services/users.service";
 import { Request, Response } from "express";
-import { encryptPassword, isStrongPassword } from "../utils/vars";
+import {
+  decryptPassword,
+  encryptPassword,
+  isStrongPassword,
+  setResponse,
+} from "../utils/vars";
+import { HttpRequest } from "../utils/http.request";
+import { decrypt } from "dotenv";
 
 class AuthController {
   private user: UsersService;
@@ -13,22 +20,73 @@ class AuthController {
     try {
       const userExist = await this.user.findByEmail(email);
       if (userExist) {
-        res.status(400).json({ message: "user already exist" });
+        setResponse({
+          res,
+          message: `${HttpRequest.CONFLICT.message} | Cette utilisateur exist`,
+          statusCode: HttpRequest.CONFLICT.code,
+        });
         return;
       }
       if (password !== password_confirm) {
-        res.status(400).json({ message: "password not match" });
+        setResponse({
+          res,
+          message: HttpRequest.BAD_REQUEST.message,
+          statusCode: HttpRequest.BAD_REQUEST.code,
+        });
         return;
       }
       if (!isStrongPassword(password)) {
-        res.status(400).json({ message: "password not strong" });
+        setResponse({
+          res,
+          message: `${HttpRequest.BAD_REQUEST.message} | mot de passe faible`,
+          statusCode: HttpRequest.BAD_REQUEST.code,
+        });
         return;
       }
       const encrypt_password = encryptPassword(password);
       await this.user.create({ name, email, password: encrypt_password });
-      res.status(201).json({ message: "user created" });
+
+      setResponse({
+        res,
+        message: "user created successfully",
+        statusCode: HttpRequest.CREATED.code,
+      });
     } catch (error) {
-      res.status(500).json({ message: "error creating user", error });
+      setResponse({
+        res,
+        message: "error creating user",
+        statusCode: HttpRequest.INTERNAL_SERVER_ERROR.code,
+        error: error,
+      });
+    }
+  };
+
+  login = async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    try {
+      const userExist = await this.user.findByEmail(email);
+      if (userExist) {
+        if (!decryptPassword(userExist.password, password)) {
+          setResponse({
+            res,
+            message: `${HttpRequest.UNAUTHORIZED.message} | mot de passe incorrect`,
+            statusCode: HttpRequest.UNAUTHORIZED.code,
+          });
+          return;
+        }
+        setResponse({
+          res,
+          message: "user logged in successfully",
+          statusCode: HttpRequest.CREATED.code,
+        });
+      }
+    } catch (error) {
+      setResponse({
+        res,
+        message: "error logging in user",
+        statusCode: HttpRequest.INTERNAL_SERVER_ERROR.code,
+        error: error,
+      });
     }
   };
 }

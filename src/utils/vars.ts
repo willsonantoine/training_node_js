@@ -3,14 +3,13 @@ import { validationResult } from "express-validator";
 import * as bcrypt from "bcrypt";
 import * as fs from "fs";
 import moment from "moment";
-import path from "path"; 
+import path from "path";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET, NODE_ENV } from "./constant";
 import multer from "multer";
 import { HttpRequest } from "./http.request";
 
 export const Validator = (TabValidator: any) => [TabValidator, ValidateFields];
-
 
 export const isStrongPassword = (password: string): boolean => {
   const re =
@@ -26,8 +25,6 @@ export const encryptPassword = (password: string) => {
   return bcrypt.hashSync(password, salt);
 };
 
-
-
 // Vérifier et créer le dossier de destination si nécessaire
 const uploadDirectory = "uploads/";
 if (!fs.existsSync(uploadDirectory)) {
@@ -38,7 +35,7 @@ const storage = multer.diskStorage({
   destination: function (req: Request, file, cb) {
     cb(null, "uploads/");
   },
-  filename: function (req:Request, file, cb) {
+  filename: function (req: Request, file, cb) {
     const extension = path.extname(file.originalname);
     cb(null, file.fieldname + "-" + Date.now() + extension);
   },
@@ -77,13 +74,13 @@ export const uploadFile = multer({
 export const validateFileUpload = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   if (!req.file) {
     setResponse({
       res,
       message: `Aucun fichier n'a été téléchargé, veuillez vérifier les critères de téléchargement des fichiers avant d'effectuer cette action. nous prenons en charge les formats : ${allowedExtensions.join(
-        ", ",
+        ", "
       )} et la taille maximun est : ${maxFileSize / 1024 / 1024} Méga`,
       statusCode: HttpRequest.BAD_REQUEST.code,
     });
@@ -107,7 +104,7 @@ export function generateToken(id: string, role: string) {
 const ValidateFields = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const errors: any = validationResult(req);
   if (!errors.isEmpty()) {
@@ -144,7 +141,7 @@ export function setResponse({
   if (statusCode >= 500 && error) {
     console.error(
       `[${new Date().toISOString()}] Internal Server Error:`,
-      error,
+      error
     );
     writeLogToFile(error, "internal-server-error");
   }
@@ -179,7 +176,7 @@ export function formatPhoneNumber(phoneNumber: string): string {
 export async function writeLogToFile(
   log: any,
   file: string = "log",
-  send_to_slake = true,
+  send_to_slake = true
 ) {
   try {
     const logDirectory = "./logs";
@@ -198,7 +195,7 @@ export async function writeLogToFile(
         if (err) {
           console.error("Error writing log to file:", err);
         }
-      },
+      }
     );
     // sendAdminNotifications(log.message, EnumNotification.ERROR);
   } catch (error) {
@@ -225,6 +222,14 @@ const getDateTime = (dateTimeParam: Date) => {
 };
 function formatDate(datetime: Date) {
   return moment(datetime).format("YYYY-MM-DD HH:mm:ss");
+}
+
+export function decryptPassword(
+  encryptedPassword: string,
+  password: string
+): boolean {
+  const match = bcrypt.compareSync(password, encryptedPassword);
+  return match;
 }
 
 export default { getDate, getDateTime, formatDate };
